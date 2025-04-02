@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(uuid()) // Unique user ID
+  email     String   @unique // Unique email for login
+  password  String? // Encrypted password (optional)
+  name      String? // Optional name
+  image     String? // Profile picture
+  role      Role     @default(USER) // Role-based access control
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  accounts Account[]
+  sessions Session[]
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String // Foreign key to User
+  type              String // OAuth type (Google, GitHub, etc.)
+  provider          String // OAuth provider name
+  providerAccountId String  @unique // Unique ID from provider
+  refresh_token     String? // Optional refresh token
+  access_token      String? // OAuth access token
+  expires_at        Int? // Token expiration timestamp
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique // JWT session token
+  userId       String
+  expires      DateTime // Expiry time
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id      String   @id @default(uuid())
+  email   String   @unique
+  token   String   @unique
+  expires DateTime
+}
+
+enum Role {
+  USER
+  ADMIN
+}

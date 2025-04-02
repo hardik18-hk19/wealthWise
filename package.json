@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@prisma/client": "^6.5.0",
     "@radix-ui/react-slot": "^1.1.2",
     "@types/node": "20.11.20",
     "@types/react": "18.2.62",
